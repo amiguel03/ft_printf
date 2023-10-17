@@ -16,7 +16,7 @@ CFLAGS=-Wall -Werror -Wextra
 FT=		ft_printf.c \
 		ft_putchar.c \
 		ft_putnbr.c \
-		ft_num_nosign.c \
+		ft_num_nosing.c \
 		ft_punt_hexa.c \
 		ft_putstr.c \
 		ft_strlen.c \
