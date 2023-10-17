@@ -10,39 +10,30 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME = libftprintf.a
+NAME=ft_printf.a
+CC=gcc
+CFLAGS=-Wall -Werror -Wextra
+FT=		ft_printf.c \
+		ft_putchar.c \
+		ft_putnbr.c \
+		ft_num_nosign.c \
+		ft_punt_hexa.c \
+		ft_putstr.c \
+		ft_strlen.c \
+		ft_hexa_min.c \
+		ft_hexa_mayus.c
+OBJ=$(FT:%.c=%.o)
+all: $(NAME)
 
-SRCS = ft_printf.c ft_putchar.c ft_putnbr.c ft_num_nosign.c ft_punt_hexa.c \
-				ft_putstr.c ft_strlen.c ft_hexa_min.c ft_hexa_mayus.c
-
-INCLUDE = ft_printf.h
-
-CC = gcc
-RM = rm -f
-AR = ar rcs
-CFLAGS = -Wall -Wextra -Werror
-
-%.o: %.c ${INCLUDE}
-			@echo "${BLUE} ◎ $(BROWN)Compiling   ${MAGENTA}→   $(CYAN)$< $(DEF_COLOR)"
-			@${CC} ${CFLAGS} -c $< -o $@
-
-OBJS = ${SRCS:.c=.o}
-
-all:	${NAME}
-
-${NAME}: ${OBJS}
-		@${AR} ${NAME} ${OBJS}
-		@echo "\n$(GREEN) Created $(NAME) ✓ $(DEF_COLOR)\n"
-
+$(NAME): $(OBJ)
+	ar rc $(NAME) $(OBJ)
+%.o: %.c
+	CC $(CFLAGS) -c $< -o $@
+	
 clean:
-		@${RM} ${OBJS}
-		@echo "\n${BLUE} ◎ $(RED)All objects cleaned successfully ${BLUE}◎$(DEF_COLOR)\n"
-
-fclean:
-		@${RM} ${OBJS}
-		@${RM} ${NAME}
-		@echo "\n${BLUE} ◎ $(RED)All objects and executable cleaned successfully${BLUE} ◎$(DEF_COLOR)\n"
-
+	rm -rf $(OBJ)
+fclean: clean
+	rm -rf $(NAME)
 re: fclean all
-
-.PHONY: all clean fclean re
+	$(NAME)
+.PHONY: clean bonus fclean re all
