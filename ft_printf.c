@@ -3,89 +3,79 @@
 /*                                                        :::      ::::::::   */
 /*   ft_printf.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: amiguel- <amiguel-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/10/13 14:14:28 by marvin            #+#    #+#             */
-/*   Updated: 2023/10/13 14:14:28 by marvin           ###   ########.fr       */
+/*   Created: 2023/11/20 12:55:30 by amiguel-          #+#    #+#             */
+/*   Updated: 2023/12/11 17:05:54 by amiguel-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-static	int	type_var(char c, va_list element);
-
-static int	w_str_percent(char c, va_list element)
+int	ft_putchar_c(int c, int counter)
 {
-	int	let;
-
-	let = 0;
-	if (c != '%')
-	{
-		let = type_var(c, element);
-		if (let == -1)
-			return (-1);
-		return (let);
-	}
-	else
-	{
-		if (write (1, &c, 1) != 1)
-			return (-1);
-		return (1);
-	}
+	write(1, &c, 1);
+	counter++;
+	return (counter);
 }
 
-static	int	w_str(const char *str, va_list element, int let)
+int	ft_putstr_c(char *str, int counter)
 {
-	int		i;
+	int	i;
 
 	i = 0;
-	while (str[i])
+	if (!str)
+		str = "(null)";
+	while (str[i] != '\0')
 	{
-		if (str[i] == '%')
-		{
-			let = let + w_str_percent(str[i + 1], element);
-			if (let == -1)
-				return (-1);
-			i++;
-		}
-		else
-		{
-			if (write (1, &str[i], 1) != 1)
-				return (-1);
-			let++;
-		}
+		write(1, &str[i], 1);
+		counter++;
 		i++;
 	}
-	return (let);
+	return (counter);
 }
 
-int	ft_printf(const char *str, ...)
+int	ft_analyze(const char *str, int i, va_list args, int counter)
 {
-	va_list	element;
-	int		let;
-
-	let = 0;
-	va_start(element, str);
-	let = w_str(str, element, let);
-	va_end(element);
-	return (let);
+	if (str[i] == '%')
+		counter = ft_putchar_c('%', counter);
+	else if (str[i] == 'c')
+		counter = ft_putchar_c(va_arg(args, int), counter);
+	else if (str[i] == 's')
+		counter = ft_putstr_c(va_arg(args, char *), counter);
+	else if (str[i] == 'd' || str[i] == 'i')
+		counter = ft_putnbr_c(va_arg(args, int), counter);
+	else if (str[i] == 'u')
+		counter = ft_putnbr_unsigned(va_arg(args, unsigned int), counter);
+	else if (str[i] == 'p')
+		counter = ft_putptr_c(va_arg(args, void *), counter);
+	else if (str[i] == 'x')
+		counter = (ft_hexa_min(va_arg(args, unsigned int), counter));
+	else if (str[i] == 'X')
+		counter = (ft_hexa_mayus(va_arg(args, unsigned int), counter));
+	return (counter);
 }
 
-static int	type_var(char c, va_list element)
+int	ft_printf(char const *str, ...)
 {
-	if (c == 'c')
-		return (ft_putchar(va_arg(element, int)));
-	if (c == 's')
-		return (ft_putstr(va_arg(element, char *)));
-	if (c == 'p')
-		return (ft_punt_hexa(va_arg(element, void *)));
-	if (c == 'd' || c == 'i')
-		return (ft_putnbr(va_arg(element, int)));
-	if (c == 'u')
-		return (ft_num_nosign(va_arg(element, unsigned int)));
-	if (c == 'x')
-		return (ft_hexa_min(va_arg(element, int)));
-	if (c == 'X')
-		return (ft_hexa_mayus(va_arg(element, int)));
-	return (0);
+	int		i;
+	int		counter;
+	va_list	args;
+
+	va_start(args, str);
+	i = 0;
+	counter = 0;
+	while (str[i] != '\0')
+	{
+		if (str[i] == '%' && str[i + 1] != '\0')
+		{
+			i++;
+			counter = ft_analyze((char *)str, i, args, counter);
+		}
+		else
+			counter = ft_putchar_c(str[i], counter);
+		i++;
+	}
+	va_end(args);
+	return (counter);
 }
